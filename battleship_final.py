@@ -11,8 +11,8 @@ for i in range(10):
 	for j in range(10):
 		matrix[i][j] =0
 
-'''print "Print the input matrix\n"
-for i in range(0,10):
+#print "Print the input matrix\n"
+'''for i in range(0,10):
 	for j in range(0,10):
 		print "%d "%matrix[i][j],
 	print "\n"	
@@ -30,8 +30,6 @@ print "\n\n"'''
 for i in range(0,10):
 	for j in range(0,10):
 		ship_matrix[i][j]=txt2.read(1)
-		char = txt2.read(1)
-
 
 for i in range(0,10):
 	for j in range(0,10):
@@ -40,7 +38,7 @@ for i in range(0,10):
 '''for i in range(0,10):
 	for j in range(0,10):
 		print "%c "%ship_matrix[i][j],
-	print "\n"	'''	
+	print "\n"'''		
 
 ship_size= [5,4,3,3,2]
 shipstate= [1,1,1,1,1]
@@ -179,13 +177,29 @@ def print_prob():
 
 # returns the cell with max probability among all possible(not tried) cells of the matrix
 def calc_max_prob():
+	count=1
+	max_matrix=[[0 for x in range(10)]for y in range(10)]
 	max_val = 0
 	max_index = [0,0]
 	for i in range(0,10):
 		for j in range(0,10):
 			if probability[i][j]>max_val:
 				max_val = probability[i][j]
-				max_index = [i,j]
+				max_index=[i,j]
+
+	for i in range(0,10):
+		for j in range(0,10):
+			if probability[i][j]==max_val:
+				max_matrix[i][j]=count;
+				count+=1;
+
+	random=randint(1,count-1)	
+	for i in range(0,10):
+		for j in range(0,10):
+			if max_matrix[i][j]==random:
+				max_index=[i,j]
+				break;			
+			
 	#print("max_index = (%d,%d)"%(max_index[0],max_index[1]))
 	return max_index			
 
@@ -202,67 +216,56 @@ def hunt():
 			count_moves+=1
 			matrix[max_index[0]][max_index[1]]='M'
 			probability[max_index[0]][max_index[1]]=0
-			for x in range(5):
-				if shipstate[x] ==1:
+			'''for x in range(5):
+				if shipstate[x]==1:
 					length = ship_size[x]
-					for i in range(10):
-						probability[max_index[0]][i]=0
-					for i in range(10):
-						probability[i][max_index[1]]=0
-					count = 0
-					initial = 0
-					for j in range(10):
-						if not (matrix[max_index[0]][j]=='M'):
-							count=count+1
-						if (matrix[max_index[0]][j]=='M') or j==9:
-							if count>=length:
-								max_value = count-length+1
-								if max_value>length:
-									max_value=length
-								value=1
-								start = initial
-								end = initial+count-1
-								while start<=end:
-									if(value>max_value):
-										value = max_value
-									if start!=end:
-										probability[max_index[0]][start]=probability[max_index[0]][start]+value
-										probability[max_index[0]][end]=probability[max_index[0]][end]+value
-									else:
-										probability[max_index[0]][start]=probability[max_index[0]][start]+value
-									start+=1
-									end-=1
-									value+=1			
+					count1=0
+					count2=0
+					for i in range(max_index[1]+1,min(max_index[1]+length,10)):
+						if not(matrix[max_index[0]][i] =='M'):
+							count1 = count1+1
+						else:
+							break	
+					for i in range(max(max_index[1]-length+1,0),max_index[1]):
+						if not(matrix[max_index[0]][i] =='M'):
+							count2 = count2+1
+						else:
+							break
+					value = 1
+					for i in xrange(max_index[1]+count1,max_index[1],-1):
+						probability[max_index[0]][i] = probability[max_index[0]][i] - value
+						value = value+1
+					value=1	
+					for i in range(max_index[1]-count2,max_index[1]):
+						probability[max_index[0]][i] = probability[max_index[0]][i] - value
+						value = value+1	
 
-							initial = j+1
-							count=0
-					
-					count = 0
-					initial = 0
-					for j in range(10):
-						if not (matrix[j][max_index[1]]=='M'):
-							count=count+1
-						if (matrix[j][max_index[1]]=='M') or j==9:
-							if count>=length:
-								max_value = count-length+1
-								if max_value>length:
-									max_value=length
-								value=1
-								start = initial
-								end = initial+count-1
-								while start<=end:
-									if(value>max_value):
-										value=max_value
-									if start!=end:
-										probability[start][max_index[1]]=probability[start][max_index[1]]+value
-										probability[end][max_index[1]]=probability[end][max_index[1]]+value
-									else:
-										probability[start][max_index[1]]=probability[start][max_index[1]]+value	
-									start+=1
-									end-=1
-									value+=1			
-							initial = j+1
-							count=0		
+					count1=0
+					count2=0
+					for i in range(max_index[0]+1,min(max_index[0]+length,10)):
+						if not(matrix[i][max_index[1]] =='M'):
+							count1 = count1+1
+						else:
+							break	
+					for i in range(max(max_index[0]-length+1,0),max_index[0]):
+						if not(matrix[i][max_index[1]] =='M'):
+							count2 = count2+1
+						else:
+							break
+					value = 1
+					for i in xrange(max_index[0]+count1,max_index[0],-1):
+						probability[i][max_index[1]] = probability[i][max_index[1]] - value
+						value = value+1
+					value=1	
+					for i in range(max_index[0]-count2,max_index[0]):
+						probability[i][max_index[1]] = probability[i][max_index[1]] - value
+						value = value+1'''
+			for y in range(0,10):
+				if(y!=max_index[1]):
+					probability[max_index[0]][y]=count_horizontal(max_index[0],y)+count_vertical(max_index[0],y)
+			for x in range(0,10):
+				if(x!=max_index[0]):
+					probability[x][max_index[1]]=count_horizontal(x,max_index[1])+count_vertical(x,max_index[1])					
 			#print_prob()
 			hunt()
 		elif ship_matrix[max_index[0]][max_index[1]] !='X':
@@ -272,6 +275,7 @@ def hunt():
 			target_mode(max_index[0],max_index[1],char)
 			if(all_destroyed()==True):
 				#print "Game Over"
+				print count_moves
 				z = str(count_moves)
 				txt3.write(z)
 				exit(1)
@@ -280,12 +284,14 @@ def hunt():
 				hunt()
 		elif ship_matrix[max_index[0]][max_index[1]] =='X':
 			#print "Game Over"
+			print count_moves
 			z = str(count_moves)
 			txt3.write(z)
 	else:
-			#print "Game Over"
-			z = str(count_moves)
-			txt3.write(z)
+		#print "Game Over"
+		z = str(count_moves)
+		print count_moves
+		txt3.write(z)
 			
 # the main function which is called once a cell which contains a ship is hit
 def target_mode(i,j,char):
@@ -296,14 +302,10 @@ def target_mode(i,j,char):
 	global count_moves
 	count=[0,0,0,0]
 	# to count the possible options for the four neighbours once a cell is hit
-	count_horizontal(i,j-1,0)
-	count_vertical(i,j-1,0)
-	count_horizontal(i-1,j,1)
-	count_vertical(i-1,j,1)
-	count_horizontal(i,j+1,2)
-	count_vertical(i,j+1,2)
-	count_horizontal(i+1,j,3)
-	count_vertical(i+1,j,3)
+	count[0]=count_horizontal(i,j-1)+count_vertical(i,j-1)
+	count[1]=count_horizontal(i-1,j)+count_vertical(i-1,j)
+	count[2]=count_horizontal(i,j+1)+count_vertical(i,j+1)
+	count[3]=count_horizontal(i+1,j)+count_vertical(i+1,j)
 	max_index=maximum()
 	# deciding the next target
 	if max_index==0:
@@ -464,6 +466,7 @@ def destroy_ship(direction,i,j,start_i,start_j,char,flag):      # the flag helps
 				destroy_ship("left",start_i,start_j,start_i,start_j,char,flag)
 	elif flag>1:
 		#print "There is an adjacent ship"
+		matrix[start_i][start_j]='0'
 		target_mode(start_i,start_j,char)			
 # checks whether a cell contains a ship or not
 # can use a parameter char to check for a particular ship
@@ -497,7 +500,8 @@ def update_matrix(char):
 				matrix[i][j]='M'	
 
 # counts the number of ways to place all(alive) ships horizontally such that they pass through (i,j)
-def count_horizontal(i,j,index):
+def count_horizontal(i,j):
+	s=0
 	idx=0
 	for size in ship_size:
 		if shipstate[idx]==0:
@@ -514,11 +518,14 @@ def count_horizontal(i,j,index):
 							break
 
 					if flag==1:
-						count[index]+=1
+						s+=1
 	idx+=1
+
+	return s
 			
 # counts the number of ways to place all(alive) ships vertically such that they pass through (i,j)
-def count_vertical(i,j,index):
+def count_vertical(i,j):
+	s=0
 	idx=0
 	for size in ship_size:
 		if shipstate[idx]==0:
@@ -535,8 +542,10 @@ def count_vertical(i,j,index):
 							break
 
 					if flag==1:
-						count[index]+=1
+						s+=1
 	idx+=1
+
+	return s
 
 
 hunt_begin()
