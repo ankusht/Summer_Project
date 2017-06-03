@@ -205,47 +205,64 @@ def hunt():
 			for x in range(5):
 				if shipstate[x] ==1:
 					length = ship_size[x]
-					count1=0
-					count2=0
-					for i in range(max_index[1]+1,min(max_index[1]+length,10)):
-						if not(matrix[max_index[0]][i] =='M'):
-							count1 = count1+1
-						else:
-							break	
-					for i in range(max(max_index[1]-length+1,0),max_index[1]):
-						if not(matrix[max_index[0]][i] =='M'):
-							count2 = count2+1
-						else:
-							break
-					value = 1
-					for i in xrange(max_index[1]+count1,max_index[1],-1):
-						probability[max_index[0]][i] = probability[max_index[0]][i] - value
-						value = value+1
-					value=1	
-					for i in range(max_index[1]-count2,max_index[1]):
-						probability[max_index[0]][i] = probability[max_index[0]][i] - value
-						value = value+1	
+					for i in range(10):
+						probability[max_index[0]][i]=0
+					for i in range(10):
+						probability[i][max_index[1]]=0
+					count = 0
+					initial = 0
+					for j in range(10):
+						if not (matrix[max_index[0]][j]=='M'):
+							count=count+1
+						if (matrix[max_index[0]][j]=='M') or j==9:
+							if count>=length:
+								max_value = count-length+1
+								if max_value>length:
+									max_value=length
+								value=1
+								start = initial
+								end = initial+count-1
+								while start<=end:
+									if(value>max_value):
+										value = max_value
+									if start!=end:
+										probability[max_index[0]][start]=probability[max_index[0]][start]+value
+										probability[max_index[0]][end]=probability[max_index[0]][end]+value
+									else:
+										probability[max_index[0]][start]=probability[max_index[0]][start]+value
+									start+=1
+									end-=1
+									value+=1			
 
-					count1=0
-					count2=0
-					for i in range(max_index[0]+1,min(max_index[0]+length,10)):
-						if not(matrix[i][max_index[1]] =='M'):
-							count1 = count1+1
-						else:
-							break	
-					for i in range(max(max_index[0]-length+1,0),max_index[0]):
-						if not(matrix[i][max_index[1]] =='M'):
-							count2 = count2+1
-						else:
-							break
-					value = 1
-					for i in xrange(max_index[0]+count1,max_index[0],-1):
-						probability[i][max_index[1]] = probability[i][max_index[1]] - value
-						value = value+1
-					value=1	
-					for i in range(max_index[0]-count2,max_index[0]):
-						probability[i][max_index[1]] = probability[i][max_index[1]] - value
-						value = value+1
+							initial = j+1
+							count=0
+					
+					count = 0
+					initial = 0
+					for j in range(10):
+						if not (matrix[j][max_index[1]]=='M'):
+							count=count+1
+						if (matrix[j][max_index[1]]=='M') or j==9:
+							if count>=length:
+								max_value = count-length+1
+								if max_value>length:
+									max_value=length
+								value=1
+								start = initial
+								end = initial+count-1
+								while start<=end:
+									if(value>max_value):
+										value=max_value
+									if start!=end:
+										probability[start][max_index[1]]=probability[start][max_index[1]]+value
+										probability[end][max_index[1]]=probability[end][max_index[1]]+value
+									else:
+										probability[start][max_index[1]]=probability[start][max_index[1]]+value	
+									start+=1
+									end-=1
+									value+=1			
+							initial = j+1
+							count=0		
 			#print_prob()
 			hunt()
 		elif ship_matrix[max_index[0]][max_index[1]] !='X':
