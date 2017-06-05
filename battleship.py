@@ -15,6 +15,7 @@ for i in range(10):
 ships = [5,4,3,3,2]
 sunk = [0,0,0,0,0]
 probability = [[0 for x in range(10)]for y in range(10)]
+#calculate and fill the probability matrix given the state of ship: whether a cell has been checked or not
 def hunt_begin():
 	for x in range(5):
 		if sunk[x]==0:
@@ -83,7 +84,7 @@ def print_prob():
 		print "\n"
 
 hunt_begin()
-
+#find the cell with maximum probability
 def calc_max_prob():
 	max_val = 0
 	max_index = [0,0]
@@ -98,6 +99,7 @@ def calc_max_prob():
 
 def hunt():	
 	max_index = calc_max_prob()
+	#if the cell was a miss update the probability in the row and column containing the cell and call the function again
 	if matrix[max_index[0]][max_index[1]] =='0':
 		matrix[max_index[0]][max_index[1]]='M'
 		probability[max_index[0]][max_index[1]]=0
