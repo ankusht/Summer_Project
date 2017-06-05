@@ -27,7 +27,7 @@ for i in range(10):
 	for j in range(10):
 		ship_player1[i][j]=player1[i][j]
 		ship_player2[i][j]=player2[i][j]
-
+#when a ship is completely destroyed update the matrix
 def update_ship_matrix(player,ch):
 	for i in range(0,10):
 		for j in range(0,10):
@@ -68,7 +68,7 @@ def destroyed(ch,player):
 
 	update_ship_matrix(player,ch)	
 
-
+#searches if a particular ship has completely been destroyed or if all the ships have been destroyed
 def search(player,matrix):
 	for ch in ships:
 		count=0
@@ -110,16 +110,18 @@ while(True):
 	print("Player1: Enter the coordinates:")		
 	x = int(input())
 	y = int(input())
+	#test if it is a hit
 	if(player2[x][y]=='C' or player2[x][y]=='B' or player2[x][y]=='R' or player2[x][y]=='S' or player2[x][y]=='D'):
 		print("Hit")
 		player2[x][y]='X'
 		matrix1[x][y]='H'
+		#check if the game is over or if a ship is completely destroyed
 		if search(2,player2)==1:
 			break
 	else:
 		print("Miss")
 		matrix1[x][y]='M'
-
+	#do same for second player	
 	print("Player2: Enter the coordinates:")		
 	i = int(input())
 	j = int(input())
