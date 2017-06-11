@@ -1,6 +1,6 @@
 #!/bin/bash
 s=0
-for ((a=0;a<100;a++))
+for ((a=0;a<10000;a++))
 do
 	python setting_ships.py ships.txt
 	python battleship_final2.py ships.txt no_of_moves.txt
@@ -11,4 +11,4 @@ do
 	done	
 	s=$(($SUM+$s))
 done
-echo $s/100 | bc -l
+echo $s/10000 | bc -l
