@@ -1,11 +1,8 @@
 from random import randint
-from sys import argv
-script,file = argv
 matrix = [['0' for x in range(10)]for y in range(10)]
-ship =""
 ships = ['C','B','R','S','D']
 length = [5,4,3,3,2]
-txt = open(file,'w')		
+txt = open('ships.txt','w')		
 
 #place the ship horizontally
 def write_at_x(a,b,x,l):
@@ -19,13 +16,11 @@ def write_at_y(a,b,x,l):
 
 #check if the ship can be placed at the random coordinates
 def check(a,b,d,l):
-	if matrix[a][b]=='C' or matrix[a][b]=='B' or matrix[a][b]=='R' or matrix[a][b]=='S' or matrix[a][b]=='D':
-		return False
 	flag=0
 	if d==0:
 		if b+l>10:
 			return False
-		for i in range(b+1,b+l):
+		for i in range(b,b+l):
 			if matrix[a][i]=='C' or matrix[a][i]=='B' or matrix[a][i]=='R' or matrix[a][i]=='S' or matrix[a][i]=='D':
 				flag=1
 				break
@@ -36,7 +31,7 @@ def check(a,b,d,l):
 	else:
 		if a+l>10:
 			return False
-		for i in range(a+1,a+l):
+		for i in range(a,a+l):
 			if matrix[i][b]=='C' or matrix[i][b]=='B' or matrix[i][b]=='R' or matrix[i][b]=='S' or matrix[i][b]=='D':
 				flag=1
 				break
@@ -47,31 +42,33 @@ def check(a,b,d,l):
 										
 
 #place all the ships
-idx=0
-for x in ships:
-	while(True):
-		a = randint(0,9)
-		b = randint(0,9)
-		direction = randint(0,1)
-		if(direction==0):
-			if not(check(a,b,direction,length[idx])):
-				continue
+def main():
+	ship =""
+	idx=0
+	for x in ships:
+		while(True):
+			a = randint(0,9)
+			b = randint(0,9)
+			direction = randint(0,1)
+			if(direction==0):
+				if not(check(a,b,direction,length[idx])):
+					continue
+				else:
+					write_at_x(a,b,x,length[idx])
+					break
 			else:
-				write_at_x(a,b,x,length[idx])
-				break
-		else:
-			if not(check(a,b,direction,length[idx])):
-				continue
+				if not(check(a,b,direction,length[idx])):
+					continue
+				else:
+					write_at_y(a,b,x,length[idx])
+					break			
+		idx=idx+1			
+
+	for i in range(10):
+		for j in range(10):
+			if j!=9:
+				ship+=matrix[i][j]+" "
 			else:
-				write_at_y(a,b,x,length[idx])
-				break			
-	idx=idx+1			
+				ship+=matrix[i][j]+"\n"			
 
-for i in range(10):
-	for j in range(10):
-		if j!=9:
-			ship+=matrix[i][j]+" "
-		else:
-			ship+=matrix[i][j]+"\n"			
-
-txt.write(ship)				
+	txt.write(ship)				
