@@ -7,12 +7,12 @@ matrix = [['0' for i in range(10)]for j in range(10)]
 copy_matrix = [['0' for i in range(10)]for j in range(10)]
 probability = [[0 for i in range(0,10)]for j in range(0,10)]
 shipstate = [1,1,1,1,1]
+shipstate_copy = [1,1,1,1,1]
 ship_size = [5,4,3,3,2]
 test_val = 10
 sub_val = 3
 ships = ['C','B','R','S','D']
 ship_matrix = [['0' for i in range(0,10)]for j in range(0,10)]
-txt2 = open('ships.txt','w')
 
 #read from file
 for i in range(0,10):
@@ -20,8 +20,10 @@ for i in range(0,10):
 		matrix[i][j] = txt.read(1)
 		copy_matrix[i][j]=matrix[i][j]
 		char = txt.read(1)
+for i in range(0,5):
+	shipstate_copy[i] = int(txt.read(1))
 
-hits = [[0 for x in range(0,4)]for y in range(0,50)]
+hits = [[0 for x in range(0,4)]for y in range(0,10)]
 
 def write_to_file():
 	ship=""
@@ -114,7 +116,20 @@ def print_prob():
 			if j==9:
 				print("%d\n"%(probability[i][j])),
 			else:
-				print("%d "%(probability[i][j])),	
+				print("%d "%(probability[i][j])),
+
+def sort(n):
+	for i in range(0,n):
+		maximum = hits[i][2]
+		maximum_index = i
+		for j in range(i+1,n):
+			if hits[j][2]>maximum:
+				maximum=hits[j][2]
+				maximum_index=j		
+		for j in range(0,4):
+			temp = hits[i][j]
+			hits[i][j] = hits[maximum_index][j]
+			hits[maximum_index][j] = temp		
 
 #search for positions which have hits
 def search_hits():
@@ -125,14 +140,14 @@ def search_hits():
 				matrix[i][j]='0'
 				length =1
 				direction = -1
-				if matrix[i+1][j]=='H':
+				if i+1<10 and matrix[i+1][j]=='H':
 					x=i+1
 					direction=1
 					while x<10 and matrix[x][j]=='H':
 						matrix[x][j]='0'
 						length+=1
-						x+=1
-				elif matrix[i][j+1]=='H':
+						x+=1			
+				elif j+1<10 and matrix[i][j+1]=='H':
 					x=j+1
 					direction=2
 					while x<10 and matrix[i][x]=='H':
@@ -141,6 +156,7 @@ def search_hits():
 						x+=1
 				hits[idx] = [i,j,length,direction]
 				idx+=1
+	sort(idx)			
 
 def empty_ship_matrix():
 	for i in range(10):
@@ -149,11 +165,11 @@ def empty_ship_matrix():
 
 def update_ship_state():
 	for i in range(0,5):
-		shipstate[i]=1
+		shipstate[i]=shipstate_copy[i]
 
 #generate the probability matrix by taking a large number of random configurations
 def generate():
-	for num in range(100000):
+	for num in range(10000):
 		empty_ship_matrix()
 		update_ship_state()
 		for x in hits:
@@ -161,9 +177,11 @@ def generate():
 				if x[3]!=-1:
 					place_ships_hit_area(x[0],x[1],x[2],x[3])
 				else:
-					d = randint(1,2)
-					place_ships_hit_area(x[0],x[1],x[2],d)
-		main()
+					while(True):
+						d = randint(1,2)
+						if place_ships_hit_area(x[0],x[1],x[2],d)==1:
+							break
+		place_remaining_ships()
 		for i in range(10):
 			for j in range(10):
 				if ship_matrix[i][j]=='C' or ship_matrix[i][j]=='B' or ship_matrix[i][j]=='R' or ship_matrix[i][j]=='S' or ship_matrix[i][j]=='D':
@@ -180,21 +198,28 @@ def place_ships_hit_area(x,y,length,direction):
 		if shipstate[num]==1:
 			if ship_size[num]>length:
 				diff = ship_size[num]-length
-				while(True):
+				flag=0
+				for i in range(0,50):
 					r = randint(0,diff)
 					if direction==1:
-						if x-r>=0 and x-r+ship_size[num]<=9:
+						if x-r>=0 and x-r+ship_size[num]<=10 and check(x-r,y,direction,ship_size[num])==True:
 							for i in range(x-r,x-r+ship_size[num]):
 								ship_matrix[i][y]=ships[num]
 							shipstate[num]=0
+							flag=1
 							break	
 					elif direction==2:
-						if y-r>=0 and y-r+ship_size[num]<=9:
+						if y-r>=0 and y-r+ship_size[num]<=10 and check(x,y-r,direction,ship_size[num])==True:
 							for i in range(y-r,y-r+ship_size[num]):
 								ship_matrix[x][i]=ships[num]
 							shipstate[num]=0
-							break	
-				break					
+							flag=1
+							break
+				if flag==1:
+					return 1
+				else:
+					return 0					
+				break							
 #place the ship horizontally
 def write_at_x(a,b,x,l):
 	for i in range(b,b+l):
@@ -208,7 +233,7 @@ def write_at_y(a,b,x,l):
 #check if the ship can be placed at the random coordinates
 def check(a,b,d,l):
 	flag=0
-	if d==0:
+	if d==2:
 		if b+l>10:
 			return False
 		for i in range(b,b+l):
@@ -233,15 +258,15 @@ def check(a,b,d,l):
 										
 
 #place all the remaining ships
-def main():
+def place_remaining_ships():
 	idx=0
 	for x in ships:
 		if shipstate[idx]==1:
 			while(True):
 				a = randint(0,9)
 				b = randint(0,9)
-				direction = randint(0,1)
-				if(direction==0):
+				direction = randint(1,2)
+				if(direction==2):
 					if not(check(a,b,direction,ship_size[idx])):
 						continue
 					else:
